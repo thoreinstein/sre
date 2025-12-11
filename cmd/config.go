@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -196,11 +197,10 @@ func editConfig() error {
 		}
 	}
 	if editor == "" {
-		return fmt.Errorf("no editor found: set $EDITOR environment variable")
+		return errors.New("no editor found: set $EDITOR environment variable")
 	}
 
 	// Execute editor
-	//nolint:gosec // G204: editor from trusted env var or known safe list
 	cmd := exec.Command(editor, configFile)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

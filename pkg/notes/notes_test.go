@@ -60,12 +60,7 @@ func TestGetDailyNotePath(t *testing.T) {
 }
 
 func TestCreateTicketNote_Success(t *testing.T) {
-	// Create temp directory
-	tmpDir, err := os.MkdirTemp("", "notes-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	m := NewManager(tmpDir, "daily", "", false)
 
@@ -111,11 +106,7 @@ func TestCreateTicketNote_Success(t *testing.T) {
 }
 
 func TestCreateTicketNote_AlreadyExists(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "notes-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	m := NewManager(tmpDir, "daily", "", false)
 
@@ -157,11 +148,7 @@ func TestCreateTicketNote_AlreadyExists(t *testing.T) {
 }
 
 func TestCreateTicketNote_HackTemplate(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "notes-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	m := NewManager(tmpDir, "daily", "", false)
 
@@ -207,15 +194,11 @@ func TestCreateTicketNote_BasePathNotExists(t *testing.T) {
 }
 
 func TestUpdateDailyNote_CreateNew(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "notes-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	m := NewManager(tmpDir, "daily", "", false)
 
-	err = m.UpdateDailyNote("proj-123", "proj")
+	err := m.UpdateDailyNote("proj-123", "proj")
 	if err != nil {
 		t.Fatalf("UpdateDailyNote() error = %v, want nil", err)
 	}
@@ -234,11 +217,7 @@ func TestUpdateDailyNote_CreateNew(t *testing.T) {
 }
 
 func TestUpdateDailyNote_AppendToExisting(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "notes-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	m := NewManager(tmpDir, "daily", "", false)
 
@@ -254,7 +233,7 @@ func TestUpdateDailyNote_AppendToExisting(t *testing.T) {
 		t.Fatalf("Failed to create existing daily note: %v", err)
 	}
 
-	err = m.UpdateDailyNote("proj-123", "proj")
+	err := m.UpdateDailyNote("proj-123", "proj")
 	if err != nil {
 		t.Fatalf("UpdateDailyNote() error = %v, want nil", err)
 	}
@@ -330,11 +309,7 @@ func TestRenderTemplate_EmbeddedTemplate(t *testing.T) {
 }
 
 func TestRenderTemplate_UserOverride(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "notes-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	// Create user template
 	userTemplate := "# Custom: {{.Ticket}}\n\nUser template content for {{.Summary}}"

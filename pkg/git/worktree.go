@@ -69,7 +69,7 @@ func NewWorktreeManagerWithRunner(baseBranchConfig string, verbose bool, runner 
 func (wm *WorktreeManager) GetRepoRoot() (string, error) {
 	output, err := wm.runner.Output(".", "git", "rev-parse", "--show-toplevel")
 	if err != nil {
-		return "", fmt.Errorf("not inside a git repository. Run this command from within your repo")
+		return "", errors.New("not inside a git repository. Run this command from within your repo")
 	}
 	return strings.TrimSpace(string(output)), nil
 }
