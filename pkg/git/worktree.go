@@ -167,6 +167,11 @@ func (wm *WorktreeManager) CreateWorktreeWithBranch(ticketType, name, branchName
 
 	worktreePath := filepath.Join(repoRoot, ticketType, name)
 
+	// Validate path stays within repo root (prevent path traversal)
+	if !strings.HasPrefix(worktreePath, repoRoot+string(filepath.Separator)) {
+		return "", fmt.Errorf("invalid path: worktree path escapes repository root")
+	}
+
 	// Create type directory if it doesn't exist
 	typeDir := filepath.Join(repoRoot, ticketType)
 	if err := os.MkdirAll(typeDir, 0755); err != nil {
@@ -311,6 +316,11 @@ func (wm *WorktreeManager) RemoveWorktree(ticketType, ticket string) error {
 	}
 
 	worktreePath := filepath.Join(repoRoot, ticketType, ticket)
+
+	// Validate path stays within repo root (prevent path traversal)
+	if !strings.HasPrefix(worktreePath, repoRoot+string(filepath.Separator)) {
+		return fmt.Errorf("invalid path: worktree path escapes repository root")
+	}
 
 	// Check if worktree exists
 	if _, err := os.Stat(worktreePath); os.IsNotExist(err) {
