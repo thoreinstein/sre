@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cockroachdb/errors"
 	"github.com/spf13/cobra"
 
 	"thoreinstein.com/sre/pkg/config"
@@ -57,13 +58,13 @@ func runCleanCommand() error {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w", err)
+		return errors.Wrap(err, "failed to load configuration")
 	}
 
 	// Find cleanup candidates
 	candidates, err := findCleanupCandidates(cfg)
 	if err != nil {
-		return fmt.Errorf("failed to find cleanup candidates: %w", err)
+		return errors.Wrap(err, "failed to find cleanup candidates")
 	}
 
 	if len(candidates) == 0 {
@@ -104,7 +105,7 @@ func runCleanCommand() error {
 		reader := bufio.NewReader(os.Stdin)
 		response, err := reader.ReadString('\n')
 		if err != nil {
-			return fmt.Errorf("failed to read input: %w", err)
+			return errors.Wrap(err, "failed to read input")
 		}
 
 		response = strings.TrimSpace(strings.ToLower(response))
@@ -154,7 +155,7 @@ func findCleanupCandidates(cfg *config.Config) ([]CleanupCandidate, error) {
 
 	worktrees, err := gitManager.ListWorktrees()
 	if err != nil {
-		return nil, fmt.Errorf("failed to list worktrees: %w", err)
+		return nil, errors.Wrap(err, "failed to list worktrees")
 	}
 
 	worktreeDetails := getWorktreeDetailsForClean(repoRoot)

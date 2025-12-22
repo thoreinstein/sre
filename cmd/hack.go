@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 
+	"github.com/cockroachdb/errors"
 	"github.com/spf13/cobra"
 
 	"thoreinstein.com/sre/pkg/config"
@@ -65,7 +65,7 @@ func runHackCommand(name string) error {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w", err)
+		return errors.Wrap(err, "failed to load configuration")
 	}
 
 	if verbose {
@@ -92,7 +92,7 @@ func runHackCommand(name string) error {
 	// For hacks, use "hack" as the type directory
 	worktreePath, err := gitManager.CreateWorktreeWithBranch("hack", name, name)
 	if err != nil {
-		return fmt.Errorf("failed to create git worktree: %w", err)
+		return errors.Wrap(err, "failed to create git worktree")
 	}
 	fmt.Printf("Git worktree created at: %s\n", worktreePath)
 

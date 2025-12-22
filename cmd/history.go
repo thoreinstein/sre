@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/spf13/cobra"
 
 	"thoreinstein.com/sre/pkg/config"
@@ -78,14 +79,14 @@ func runHistoryQueryCommand(pattern string) error {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w", err)
+		return errors.Wrap(err, "failed to load configuration")
 	}
 
 	// Initialize database manager
 	dbManager := history.NewDatabaseManager(cfg.History.DatabasePath, verbose)
 
 	if !dbManager.IsAvailable() {
-		return fmt.Errorf("history database not available at: %s", cfg.History.DatabasePath)
+		return errors.Newf("history database not available at: %s", cfg.History.DatabasePath)
 	}
 
 	// Parse time options
@@ -94,7 +95,7 @@ func runHistoryQueryCommand(pattern string) error {
 	if historySince != "" {
 		parsedSince, err := parseTimeString(historySince)
 		if err != nil {
-			return fmt.Errorf("invalid --since time: %w", err)
+			return errors.Wrap(err, "invalid --since time")
 		}
 		since = &parsedSince
 	}
@@ -102,7 +103,7 @@ func runHistoryQueryCommand(pattern string) error {
 	if historyUntil != "" {
 		parsedUntil, err := parseTimeString(historyUntil)
 		if err != nil {
-			return fmt.Errorf("invalid --until time: %w", err)
+			return errors.Wrap(err, "invalid --until time")
 		}
 		until = &parsedUntil
 	}
@@ -125,7 +126,7 @@ func runHistoryQueryCommand(pattern string) error {
 	// Query commands
 	commands, err := dbManager.QueryCommands(options)
 	if err != nil {
-		return fmt.Errorf("failed to query commands: %w", err)
+		return errors.Wrap(err, "failed to query commands")
 	}
 
 	if len(commands) == 0 {
@@ -196,7 +197,7 @@ func runHistoryInfoCommand() error {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w", err)
+		return errors.Wrap(err, "failed to load configuration")
 	}
 
 	// Initialize database manager
@@ -205,7 +206,7 @@ func runHistoryInfoCommand() error {
 	// Get database info
 	info, err := dbManager.GetDatabaseInfo()
 	if err != nil {
-		return fmt.Errorf("failed to get database info: %w", err)
+		return errors.Wrap(err, "failed to get database info")
 	}
 
 	fmt.Println("History Database Information")

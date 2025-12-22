@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/cockroachdb/errors"
 	"github.com/creativeprojects/go-selfupdate"
 	"github.com/spf13/cobra"
 )
@@ -69,7 +70,7 @@ func runUpdateCommand(ctx context.Context) error {
 	// Create GitHub source
 	source, err := selfupdate.NewGitHubSource(selfupdate.GitHubConfig{})
 	if err != nil {
-		return fmt.Errorf("failed to create GitHub source: %w", err)
+		return errors.Wrap(err, "failed to create GitHub source")
 	}
 
 	// Create updater with checksum validation
@@ -78,7 +79,7 @@ func runUpdateCommand(ctx context.Context) error {
 		Validator: &selfupdate.ChecksumValidator{UniqueFilename: "checksums.txt"},
 	})
 	if err != nil {
-		return fmt.Errorf("failed to create updater: %w", err)
+		return errors.Wrap(err, "failed to create updater")
 	}
 
 	// Detect latest release
@@ -95,11 +96,11 @@ func runUpdateCommand(ctx context.Context) error {
 	latest, found, err := updater.DetectLatest(ctx, repo)
 
 	if err != nil {
-		return fmt.Errorf("failed to detect latest version: %w", err)
+		return errors.Wrap(err, "failed to detect latest version")
 	}
 
 	if !found {
-		return fmt.Errorf("no release found for %s/%s", runtime.GOOS, runtime.GOARCH)
+		return errors.Newf("no release found for %s/%s", runtime.GOOS, runtime.GOARCH)
 	}
 
 	if verbose {
@@ -142,7 +143,7 @@ func runUpdateCommand(ctx context.Context) error {
 	// Get executable path
 	exe, err := selfupdate.ExecutablePath()
 	if err != nil {
-		return fmt.Errorf("could not locate executable path: %w", err)
+		return errors.Wrap(err, "could not locate executable path")
 	}
 
 	if verbose {
@@ -152,7 +153,7 @@ func runUpdateCommand(ctx context.Context) error {
 
 	// Perform update
 	if err := updater.UpdateTo(ctx, latest, exe); err != nil {
-		return fmt.Errorf("failed to update binary: %w", err)
+		return errors.Wrap(err, "failed to update binary")
 	}
 
 	fmt.Printf("Successfully updated to version %s\n", latest.Version())
