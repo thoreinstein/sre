@@ -378,15 +378,17 @@ func (dm *DatabaseManager) GetDatabaseInfo() (map[string]interface{}, error) {
 		info["schema"] = string(schema)
 
 		// Get command count
-		// Note: tableName is safe for SQL concatenation because it can only be one of two
-		// hardcoded string literals ("history" or "commands") determined by internal schema
-		// detection logic. This is not user-controlled input.
-		var count int64
-		tableName := "history"
-		if schema == SchemaZshHistdb {
+		// Determine table name using explicit switch for defense-in-depth.
+		// Only hardcoded values are possible; this is not user-controlled input.
+		var tableName string
+		switch schema {
+		case SchemaZshHistdb:
 			tableName = "commands"
+		default:
+			tableName = "history"
 		}
 
+		var count int64
 		err = db.QueryRow("SELECT COUNT(*) FROM " + tableName).Scan(&count)
 		if err == nil {
 			info["command_count"] = count
